@@ -59,6 +59,37 @@ default_cfgs = {
         url='https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-vt3p-weights/jx_nest_tiny-e3428fb9.pth'),
 }
 
+### ADDED CONFIGS ###
+CIFAR10_DEFAULT_MEAN = (0.4914, 0.4822, 0.4465)
+CIFAR10_DEFAULT_STD = (0.2023, 0.1994, 0.2010)
+CIFAR100_DEFAULT_MEAN = (0.507, 0.487, 0.441)
+CIFAR100_DEFAULT_STD = (0.267, 0.256, 0.276)
+
+def _cfg_cifar10(url='', **kwargs):
+    return {
+        'url': url,
+        'num_classes': 10, 'input_size': (3, 32, 32), 'pool_size': [4, 4],
+        'crop_pct': .875, 'interpolation': 'bicubic', 'fixed_input_size': True,
+        'mean': CIFAR10_DEFAULT_MEAN, 'std': CIFAR10_DEFAULT_STD,
+        'first_conv': 'patch_embed.proj', 'classifier': 'head',
+        **kwargs
+    }
+
+def _cfg_cifar100(url='', **kwargs):
+    return {
+        'url': url,
+        'num_classes': 100, 'input_size': (3, 32, 32), 'pool_size': [4, 4],
+        'crop_pct': .875, 'interpolation': 'bicubic', 'fixed_input_size': True,
+        'mean': CIFAR100_DEFAULT_MEAN, 'std': CIFAR100_DEFAULT_STD,
+        'first_conv': 'patch_embed.proj', 'classifier': 'head',
+        **kwargs
+    }
+
+default_cfgs['nest_cifar10'] =  _cfg_cifar10()
+default_cfgs['nest_cifar100'] =  _cfg_cifar100()
+default_cfgs['nest_base_cifar10'] =  _cfg_cifar100()
+### END OF ADDED CONFIGS ###
+
 
 class Attention(nn.Module):
     """
@@ -484,3 +515,39 @@ def jx_nest_tiny(pretrained=False, **kwargs):
     model_kwargs = dict(embed_dims=(96, 192, 384), num_heads=(3, 6, 12), depths=(2, 2, 8), **kwargs)
     model = _create_nest('jx_nest_tiny', pretrained=pretrained, **model_kwargs)
     return model
+
+## Add new model
+@register_model                                                                                                                                                                                             
+def nest_tiny_cifar10(pretrained=False, **kwargs):
+    model_kwargs = dict(
+        img_size=32, patch_size=1, num_levels=4, embed_dims=192, num_heads=3, depths=3,
+        num_classes=10)
+    model = _create_nest('nest_cifar10', pretrained=pretrained, **model_kwargs)
+    return model
+
+@register_model                                                                                                                                                                                             
+def nest_tiny_cifar100(pretrained=False, **kwargs):
+    model_kwargs = dict(
+        img_size=32, patch_size=1, num_levels=4, embed_dims=192, num_heads=3, depths=3,
+        num_classes=100)
+    model = _create_nest('nest_cifar100', pretrained=pretrained, **model_kwargs)
+    return model
+
+# @register_model
+# def nest_base(pretrained=False, **kwargs):
+#     """ Nest-B @ 224x224
+#     """
+#     model_kwargs = dict(
+#         embed_dims=(128, 256, 512), num_heads=(4, 8, 16), depths=(2, 2, 20), **kwargs)
+#     model = _create_nest('nest_base', pretrained=pretrained, **model_kwargs)
+#     return model
+
+@register_model                                                                                                                                                                                             
+def nest_base_cifar10(pretrained=False, **kwargs):
+    model_kwargs = dict(
+        img_size=32, patch_size=1, num_levels=4, embed_dims=768, num_heads=12, depths=4,
+        num_classes=10)
+    model = _create_nest('nest_base_cifar10', pretrained=pretrained, **model_kwargs)
+    return model
+
+## end of new model
