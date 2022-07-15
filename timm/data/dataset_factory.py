@@ -122,6 +122,8 @@ def create_dataset(
             if split in _EVAL_SYNONYM:
                 split = 'val'
             ds = ImageNet(split=split, **torch_kwargs)
+        elif name == 'cifar10':
+            ds = CIFAR10(root=root, train=is_training, download=False)
         elif name == 'image_folder' or name == 'folder':
             # in case torchvision ImageFolder is preferred over timm ImageDataset for some reason
             if search_split and os.path.isdir(root):
