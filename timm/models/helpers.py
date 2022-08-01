@@ -456,17 +456,40 @@ def update_pretrained_cfg_and_kwargs(pretrained_cfg, kwargs, kwargs_filter):
 
 
 def resolve_pretrained_cfg(variant: str, pretrained_cfg=None, kwargs=None):
+    # if pretrained_cfg and isinstance(pretrained_cfg, dict):
+    #     # highest priority, pretrained_cfg available and passed explicitly
+    #     return deepcopy(pretrained_cfg)
+    # if kwargs and 'pretrained_cfg' in kwargs:
+    #     # next highest, pretrained_cfg in a kwargs dict, pop and return
+    #     pretrained_cfg = kwargs.pop('pretrained_cfg', {})
+    #     if pretrained_cfg:
+    #         return deepcopy(pretrained_cfg)
+    # # lookup pretrained cfg in model registry by variant
+    # pretrained_cfg = get_pretrained_cfg(variant)
+    # assert pretrained_cfg
+    # return pretrained_cfg
+
     if pretrained_cfg and isinstance(pretrained_cfg, dict):
         # highest priority, pretrained_cfg available and passed explicitly
         return deepcopy(pretrained_cfg)
-    if kwargs and 'pretrained_cfg' in kwargs:
-        # next highest, pretrained_cfg in a kwargs dict, pop and return
-        pretrained_cfg = kwargs.pop('pretrained_cfg', {})
-        if pretrained_cfg:
-            return deepcopy(pretrained_cfg)
-    # lookup pretrained cfg in model registry by variant
+    # fallback to looking up pretrained conf in model registry by variant identifier
     pretrained_cfg = get_pretrained_cfg(variant)
-    assert pretrained_cfg
+    if not pretrained_cfg:
+        _logger.warning(
+            f"No ptrained configuration specified for {variant} model. Using a default in timm/models/helpers.py."
+            f" Please add a config to the model pretrained_cfg registry or pass explicitly."
+        )
+        # Config for CIFAR-100
+        pretrained_cfg = dict (
+            url='',
+            num_classes=100,
+            input_size=(3, 32, 32),
+            pool_size=None,
+            crop_pct=None,
+            interpolation='bicubic',
+            first_conv='',
+            classifier='',
+        )
     return pretrained_cfg
 
 
