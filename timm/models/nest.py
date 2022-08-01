@@ -516,6 +516,16 @@ def jx_nest_tiny(pretrained=False, **kwargs):
     model = _create_nest('jx_nest_tiny', pretrained=pretrained, **model_kwargs)
     return model
 
+# Add new jax model for cifar
+@register_model
+def jx_nest_tiny_cifar(pretrained=False, **kwargs):
+    """ Nest-T @ 32x32, Pretrained weights converted from official Jax impl.
+    """
+    kwargs['pad_type'] = 'same'
+    model_kwargs = dict(img_size=32, embed_dims=(96, 192, 384), num_heads=(3, 6, 12), depths=(2, 2, 8), **kwargs)
+    model = _create_nest('jx_nest_tiny', pretrained=pretrained, **model_kwargs)
+    return model
+
 ## Add new model
 @register_model                                                                                                                                                                                             
 def nest_tiny_cifar10(pretrained=False, **kwargs):
